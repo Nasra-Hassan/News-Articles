@@ -100,6 +100,52 @@ def analyze_text(text: str, target: Optional[str] = None, exclude_stopwords: boo
     return result
 
 
+# --- Functions required by the assessment (exact signatures) ---
+def count_specific_word(text: str, search_word: str) -> int:
+    """Count occurrences of search_word in text (case-insensitive).
+
+    Returns 0 if no matches or if search_word is empty.
+    """
+    if not search_word:
+        return 0
+    words = get_words(text or "")
+    return count_word_occurrences(search_word, words)
+
+
+def identify_most_common_word(text: str) -> Optional[str]:
+    """Return the most common word in text (lowercased). Return None for empty text."""
+    if not (text and text.strip()):
+        return None
+    words = get_words(text)
+    word, _ = most_common_word(words, exclude_stopwords=False)
+    return word
+
+
+def calculate_average_word_length(text: str) -> float:
+    """Calculate average length of words in text (excludes punctuation).
+
+    Returns 0.0 for empty text.
+    """
+    if not (text and text.strip()):
+        return 0.0
+    words = get_words(text)
+    return average_word_length(words)
+
+
+def count_paragraphs(text: str) -> int:
+    """Count paragraphs defined by empty lines. Return 1 for empty string."""
+    if not (text and text.strip()):
+        return 1
+    return len(get_paragraphs(text))
+
+
+def count_sentences(text: str) -> int:
+    """Count sentences split by .!?; return 1 for empty string."""
+    if not (text and text.strip()):
+        return 1
+    return len(get_sentences(text))
+
+
 def print_results(results: dict, target: Optional[str], top: int) -> None:
     # Canonical, minimal labeled output expected by grading
     if target:
