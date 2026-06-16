@@ -22,6 +22,16 @@ import sys
 from typing import List, Optional, Tuple
 
 
+# Module-level variable containing loaded article text (string)
+article_text: str = ''
+
+
+__all__ = [
+    'count_specific_word', 'identify_most_common_word', 'calculate_average_word_length',
+    'count_paragraphs', 'count_sentences', 'analyze_text', 'load_text', 'article_text'
+]
+
+
 STOPWORDS = {
     'the', 'and', 'a', 'an', 'to', 'of', 'in', 'for', 'on', 'with', 'is', 'was',
     'were', 'that', 'by', 'as', 'at', 'from', 'it', 'this', 'these', 'those', 'be',
