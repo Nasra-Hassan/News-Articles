@@ -1,6 +1,128 @@
 #!/usr/bin/env python3
 """pythonAssessment.py
 
+Text analysis utilities for a news article assessment.
+
+Features:
+- Count occurrences of a specific word
+- Identify most common word (optionally excluding stopwords)
+- Calculate average word length
+- Count paragraphs
+- Count sentences
+
+Usage:
+  python3 pythonAssessment.py --file article.txt --word the
+  python3 pythonAssessment.py --test
+"""
+from collections import Counter
+import re
+import argparse
+import sys
+
+
+def _words(text):
+    return re.findall(r"\b[\w']+\b", text.lower())
+
+
+def count_specific_word(text, word):
+    words = _words(text)
+    return sum(1 for w in words if w == word.lower())
+
+
+def most_common_word(text, exclude_stopwords=False):
+    words = _words(text)
+    if not words:
+        return None, 0
+    stopwords = {
+        'the','and','a','an','to','of','in','for','on','with','is','was','were','that','by','as','at','from','it'
+    }
+    c = Counter(words)
+    if exclude_stopwords:
+        for s in stopwords:
+            c.pop(s, None)
+    if not c:
+        return None, 0
+    word, count = c.most_common(1)[0]
+    return word, count
+
+
+def average_word_length(text):
+    words = _words(text)
+    if not words:
+        return 0.0
+    total_chars = sum(len(w) for w in words)
+    return total_chars / len(words)
+
+
+def count_paragraphs(text):
+    parts = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
+    return len(parts)
+
+
+def count_sentences(text):
+    # Split on sentence enders followed by whitespace; simple but effective for this task
+    parts = [s for s in re.split(r'(?<=[\.!?])\s+', text) if s.strip()]
+    return len(parts)
+
+
+def analyze(text, specific_word=None, exclude_stopwords=False):
+    results = {}
+    results['specific_word'] = (specific_word, count_specific_word(text, specific_word)) if specific_word else None
+    results['most_common'] = most_common_word(text, exclude_stopwords=exclude_stopwords)
+    results['average_word_length'] = average_word_length(text)
+    results['paragraphs'] = count_paragraphs(text)
+    results['sentences'] = count_sentences(text)
+    return results
+
+
+def _print_results(results):
+    if results['specific_word']:
+        w, c = results['specific_word']
+        print(f"Count of '{w}': {c}")
+    mc_word, mc_count = results['most_common']
+    print(f"Most common word: {mc_word} ({mc_count})")
+    print(f"Average word length: {results['average_word_length']:.2f}")
+    print(f"Paragraphs: {results['paragraphs']}")
+    print(f"Sentences: {results['sentences']}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description='News article text analysis')
+    parser.add_argument('--file', '-f', help='Path to article file (defaults to stdin)')
+    parser.add_argument('--word', '-w', help='Specific word to count')
+    parser.add_argument('--exclude-stopwords', action='store_true', help='Exclude common stopwords when finding most common word')
+    parser.add_argument('--test', action='store_true', help='Run built-in self-test example')
+    args = parser.parse_args()
+
+    if args.test:
+        sample = (
+            "President signs new bill into law. The law will affect many communities. "
+            "In related news, experts say the change could be significant.\n\n" 
+            "This is the second paragraph of the article. It contains several sentences."
+        )
+        results = analyze(sample, specific_word=args.word, exclude_stopwords=args.exclude_stopwords)
+        _print_results(results)
+        return
+
+    if args.file:
+        try:
+            with open(args.file, 'r', encoding='utf-8') as f:
+                text = f.read()
+        except Exception as e:
+            print('Error reading file:', e)
+            sys.exit(1)
+    else:
+        text = sys.stdin.read()
+
+    results = analyze(text, specific_word=args.word, exclude_stopwords=args.exclude_stopwords)
+    _print_results(results)
+
+
+if __name__ == '__main__':
+    main()
+#!/usr/bin/env python3
+"""pythonAssessment.py
+
 Performs text analysis on a news article (or any text file).
 
 Features:
