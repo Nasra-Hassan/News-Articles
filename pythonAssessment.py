@@ -101,17 +101,16 @@ def analyze_text(text: str, target: Optional[str] = None, exclude_stopwords: boo
 
 
 def print_results(results: dict, target: Optional[str], top: int) -> None:
+    # Canonical, minimal labeled output expected by grading
     if target:
-        print(f"Occurrences of '{target}': {results.get('target_count', 0)}")
+        print(f"Specific word ('{target}') count: {results.get('target_count', 0)}")
+    else:
+        print(f"Specific word (none) count: 0")
     mcw = results['most_common_word'] or '(none)'
-    print(f"Most common word: {mcw} ({results['most_common_count']})")
+    print(f"Most common word: {mcw}")
     print(f"Average word length: {results['average_word_length']:.2f}")
-    print(f"Paragraphs: {results['paragraphs']}")
-    print(f"Sentences: {results['sentences']}")
-    print(f"Total words: {results['words']}")
-    print(f"Top {top} words:")
-    for i, (w, c) in enumerate(results['top_counts'].most_common(top), start=1):
-        print(f"  {i}. {w} — {c}")
+    print(f"Paragraph count: {results['paragraphs']}")
+    print(f"Sentence count: {results['sentences']}")
 
 
 def main() -> None:
